@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Trend Analysis 2014–2020</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; }
+        header { background: #1DB954; padding: 40px; text-align: center; }
+        header h1 { font-size: 2rem; color: #000; }
+        header p { margin-top: 8px; color: #000; opacity: 0.7; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .chart-box { background: #161b22; border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+        .chart-box h2 { font-size: 1.1rem; margin-bottom: 8px; color: #1DB954; }
+        .chart-box p { font-size: 0.85rem; color: #8b949e; margin-bottom: 16px; }
+        footer { text-align: center; padding: 24px; color: #8b949e; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Spotify Trend Analysis 2014–2020</h1>
+        <p>SQL · Python · Tableau · Plotly</p>
+    </header>
+
+    <div class="container">
+        <div class="chart-box">
+            <h2>Tracks by Year</h2>
+            <p>Dataset contains 1,701 tracks across 7 years. Peak was 2016 with 303 tracks.</p>
+            <div id="chart1"></div>
+        </div>
+
+        <div class="chart-box">
+            <h2>Mood Distribution per Year</h2>
+            <p>Sad dominated 2014–2019. Remix surged to 34.5% in 2020 — possibly reflecting pandemic listening habits.</p>
+            <div id="chart2"></div>
+        </div>
+
+        <div class="chart-box">
+            <h2>Top 10 Artists</h2>
+            <p>Lil Peep leads with 21 appearances, followed by Twenty One Pilots and Post Malone.</p>
+            <div id="chart3"></div>
+        </div>
+    </div>
+
+    <footer>Built by Kenny Guo · Data Source: Spotify API via Kaggle</footer>
+
+    <script>
+        // ── 数据 ──────────────────────────────────────────────────────
+const chart1 = {"x": [2014, 2015, 2016, 2017, 2018, 2019, 2020], "y": [299, 296, 303, 275, 207, 205, 116]};
+const chart2 = {"love": [15.4, 15.2, 15.5, 13.5, 18.4, 16.6, 26.7], "night": [15.7, 17.2, 19.1, 15.3, 14.0, 19.0, 26.7], "remix": [19.4, 20.3, 21.5, 21.8, 21.3, 17.6, 34.5], "rock": [22.7, 23.0, 21.5, 26.2, 21.7, 17.1, 0.0], "sad": [26.8, 24.3, 22.4, 23.3, 24.6, 29.8, 12.1], "years": [2014, 2015, 2016, 2017, 2018, 2019, 2020]};
+const chart3 = {"artists": ["Lil Peep", "Twenty One Pilots", "Post Malone", "Tame Impala", "Imagine Dragons", "Milky Chance", "The Weeknd", "Beyoncé", "NF", "Billie Eilish"], "appearances": [21, 17, 14, 13, 13, 12, 11, 11, 10, 10]};
+
+// ── 主题 ─────────────────────────────────────────────────────
+const layout_base = {
+    paper_bgcolor: '#161b22',
+    plot_bgcolor: '#161b22',
+    font: { color: '#e6edf3', family: 'Segoe UI' },
+    margin: { t: 20, b: 50, l: 60, r: 20 },
+};
+
+const MOOD_COLORS = {
+    sad: '#5B9BD5', rock: '#E06C75',
+    remix: '#98C379', night: '#C678DD', love: '#E5C07B'
+};
+
+// ── Chart 1: Tracks by Year ───────────────────────────────────
+Plotly.newPlot('chart1', [{
+    type: 'bar',
+    x: chart1.x,
+    y: chart1.y,
+    marker: { color: '#1DB954' },
+    text: chart1.y,
+    textposition: 'outside',
+    textfont: { color: '#e6edf3' }
+}], {
+    ...layout_base,
+    xaxis: { gridcolor: '#21262d', tickfont: { color: '#8b949e' } },
+    yaxis: { gridcolor: '#21262d', tickfont: { color: '#8b949e' } },
+});
+
+// ── Chart 2: Mood Distribution ────────────────────────────────
+const moods = ['love', 'night', 'remix', 'rock', 'sad'];
+Plotly.newPlot('chart2', moods.map(mood => ({
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: mood,
+    x: chart2.years,
+    y: chart2[mood],
+    stackgroup: 'one',
+    line: { color: MOOD_COLORS[mood] },
+})), {
+    ...layout_base,
+    xaxis: { gridcolor: '#21262d', tickfont: { color: '#8b949e' } },
+    yaxis: { gridcolor: '#21262d', tickfont: { color: '#8b949e' }, title: '% of Tracks' },
+    legend: { bgcolor: '#161b22', font: { color: '#e6edf3' } }
+});
+
+// ── Chart 3: Top 10 Artists ───────────────────────────────────
+Plotly.newPlot('chart3', [{
+    type: 'bar',
+    orientation: 'h',
+    x: chart3.appearances,
+    y: chart3.artists,
+    marker: { color: '#1DB954' },
+    text: chart3.appearances,
+    textposition: 'outside',
+    textfont: { color: '#e6edf3' }
+}], {
+    ...layout_base,
+    margin: { t: 20, b: 50, l: 150, r: 20 },
+    xaxis: { gridcolor: '#21262d', tickfont: { color: '#8b949e' } },
+    yaxis: { gridcolor: '#21262d', tickfont: { color: '#8b949e' }, autorange: 'reversed' },
+});
+    </script>
+</body>
+</html>
