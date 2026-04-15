@@ -3,6 +3,7 @@
 An end-to-end data analysis project exploring Spotify track trends across 7 years.
 
 **Live Demo:** https://z1yuguo.github.io/spotify-analysis/
+**Tableau Dashboard:** https://public.tableau.com/app/profile/ziyu.guo/viz/spotify_analysis_17762366860580/Dashboard1
 
 ---
 
